@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
+from uuid import UUID
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -7,7 +8,8 @@ class UserCreate(UserBase):
     password: str
 
 class UserResponse(UserBase):
-    id: int
+    id: UUID
+    is_active: bool = Field(..., description="Whether the user is active")
 
     class Config:
         from_attributes = True
@@ -29,7 +31,7 @@ class LoginRequest(BaseModel):
         }
     }
 
-class UserCreate(BaseModel):
+class UserCreateRequest(BaseModel):
     email: str = Field(..., example="usuario@example.com", description="Email válido")
     password: str = Field(..., example="SenhaF0rte!", min_length=8, description="Senha com mínimo 8 caracteres")
 
