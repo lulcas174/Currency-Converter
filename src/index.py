@@ -2,10 +2,15 @@ import asyncio
 
 from contextlib import asynccontextmanager
 from sqlite3 import OperationalError
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
 from src.config.settings import Settings
 from src.infrastructure.database import engine, Base
 from src.domains.users.routers import router as users_router
+from src.routers import main_router
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from src.infrastructure.security import security_scheme
+
 
 settings = Settings()
 
@@ -26,9 +31,13 @@ async def lifespan(app: FastAPI):
             await asyncio.sleep(retry_delay)
     yield
 
+
 app = FastAPI(
     title="API de conversão de moedas",
-    lifespan=lifespan
+    lifespan=lifespan,
+    swagger_ui_parameters={"docExpansion": "none"},
+    # dependencies=[Depends(security_scheme)]
 )
 
-app.include_router(users_router, prefix="/api/v1")
+
+app.include_router(main_router)

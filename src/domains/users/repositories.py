@@ -2,6 +2,7 @@ from sqlalchemy import select
 from src.domains.users.models import User
 from src.infrastructure.database import get_db
 from src.infrastructure.security import get_password_hash
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserRepository:
@@ -22,8 +23,12 @@ class UserRepository:
             await db.refresh(new_user)
             return new_user
 
+    # @staticmethod
+    # async def get_user_by_email(email: str):
+    #     async with get_db() as db:
+    #         result = await db.execute(select(User).filter(User.email == email))
+    #         return result.scalar_one_or_none()
     @staticmethod
-    async def get_user_by_email(email: str):
-        async with get_db() as db:
-            result = await db.execute(select(User).filter(User.email == email))
-            return result.scalar_one_or_none()
+    async def get_user_by_email(email: str, db: AsyncSession):
+        result = await db.execute(select(User).filter(User.email == email))
+        return result.scalar_one_or_none()

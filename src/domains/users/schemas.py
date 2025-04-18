@@ -8,7 +8,6 @@ class UserCreate(UserBase):
     password: str
 
 class UserResponse(UserBase):
-    id: UUID
     is_active: bool = Field(..., description="Whether the user is active")
 
     class Config:

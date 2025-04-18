@@ -1,26 +1,65 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from src.infrastructure.security import create_access_token
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from src.domains.users.services import UserService
-from src.domains.users.schemas import LoginRequest, UserCreate, UserResponse, Token
-
-router = APIRouter(
-    prefix="/users",
-    tags=["Users"],
-    responses={404: {"description": "Not found"}},
+from src.infrastructure.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.infrastructure.security import (
+    create_access_token,
+    verify_password,
+    get_password_hash,
+    get_current_user
 )
+from .schemas import (
+    UserCreateRequest,
+    LoginRequest,
+    Token,
+    UserResponse
+)
+from sqlalchemy import select
+from .models import User
 
-@router.post("/register", response_model=UserResponse)
-async def register(user_data: UserCreate):
-    return await UserService.create_user(user_data)
+router = APIRouter(prefix="/auth", tags=["authentication"], dependencies=[])
 
 @router.post("/login", response_model=Token)
-async def login(credentials: LoginRequest):
-    user = await UserService.authenticate_user(credentials.email, credentials.password)
+async def login(
+    login_data: LoginRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    user = await UserService.authenticate_user(login_data.email, login_data.password, db)
     if not user:
         raise HTTPException(status_code=400, detail="Credenciais inválidas")
     
-    access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = create_access_token(str(user.id))
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(
+    user_data: UserCreateRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(User).where(User.email == user_data.email)
+    )
+    existing_user = result.scalars().first()
 
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email já cadastrado"
+        )
+        
+    new_user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        is_active=True
+    )
+    
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+   
+    return new_user
