@@ -4,6 +4,7 @@ from src.infrastructure.database import get_db
 from src.infrastructure.security import TokenData, get_current_user
 from .schemas import TransactionCreate, TransactionResponse
 from .services import TransactionService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(
     prefix="/transactions", 
@@ -14,11 +15,11 @@ router = APIRouter(
 @router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_transaction(
     transaction: TransactionCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: TokenData = Depends(get_current_user)
 ):
     try:
-        return TransactionService.create_transaction(
+        return await TransactionService.create_transaction(
             db=db,
             transaction_data=transaction,
             user_id=current_user.user_id

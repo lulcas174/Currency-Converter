@@ -10,25 +10,19 @@ from src.domains.users.routers import router as users_router
 from src.routers import main_router
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.infrastructure.security import security_scheme
+from sqlalchemy import text
 
 
 settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    max_retries = 5
-    retry_delay = 2
-    
-    for attempt in range(max_retries):
-        try:
-            from src.infrastructure.database import recreate_tables
-            await recreate_tables()
-            break
-        except OperationalError as e:
-            if attempt == max_retries - 1:
-                raise
-            print(f"Database connection failed (attempt {attempt + 1}), retrying...")
-            await asyncio.sleep(retry_delay)
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1"))
+        print("Database connection sucess!")
+    except Exception as e:
+        print("Erro to connect:", e)
     yield
 
 
