@@ -20,7 +20,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 load_all_models()
-target_metadata = Base.metadata 
+target_metadata = Base.metadata
 
 # Get database URL from environment variable
 DATABASE_URL = os.getenv("DATABASE_URL")

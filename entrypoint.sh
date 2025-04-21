@@ -1,14 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "🔄 Esperando banco de dados ficar disponível..."
+echo "Waiting for the database to become available..."
 
 until pg_isready -h db -p 5432; do
   sleep 1
 done
 
-echo "✅ Banco disponível, rodando migrations..."
+echo "Database is available, running migrations..."
 alembic upgrade head
 
-echo "🚀 Subindo aplicação..."
+echo "Running flake8 to check code style..."
+flake8 || { echo "flake8 found issues. Please fix them before running the application."; exit 1; }
+
+echo "Starting application..."
 exec uvicorn src.index:app --host 0.0.0.0 --port 8000 --reload

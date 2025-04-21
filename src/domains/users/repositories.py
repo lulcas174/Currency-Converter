@@ -12,7 +12,7 @@ class UserRepository:
             existing_user = await UserRepository.get_user_by_email(user_data.email)
             if existing_user:
                 raise ValueError("User already exists")
-            
+
             hashed_password = get_password_hash(user_data.password)
             new_user = User(
                 email=user_data.email,

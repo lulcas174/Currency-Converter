@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, UUID, ForeignKey, Float, DateTime
-from src.infrastructure.database import Base
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
+
+from sqlalchemy import Column, String, Boolean
+from sqlalchemy.dialects.postgresql import UUID
+
+from src.infrastructure.database import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -14,7 +17,7 @@ class User(Base):
         index=True
     )
     is_active = Column(
-        Boolean, 
+        Boolean,
         default=True,
         name="is_active"
     )

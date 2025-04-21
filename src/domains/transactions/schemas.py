@@ -1,16 +1,18 @@
-from pydantic import BaseModel, Field, ConfigDict
-from decimal import Decimal
+from pydantic import BaseModel, Field, ConfigDict, field_serializer
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Annotated
 from uuid import UUID
 from datetime import datetime
 
+
 class TransactionCreate(BaseModel):
     source_currency: str = Field(..., pattern="^(BRL|USD|EUR|JPY)$")
-    source_amount: Annotated[Decimal, Field(..., gt=0)]  # Valor > 0
+    source_amount: Annotated[Decimal, Field(..., gt=0)]
     target_currency: str = Field(..., pattern="^(BRL|USD|EUR|JPY)$")
 
+
 class TransactionResponse(BaseModel):
-    id: UUID
+    transaction_id: UUID
     user_id: UUID
     source_currency: str
     source_amount: Decimal
@@ -19,9 +21,26 @@ class TransactionResponse(BaseModel):
     conversion_rate: Decimal
     timestamp: datetime
 
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer('source_amount', 'target_value', 'conversion_rate')
+    def serialize_decimal(self, value: Decimal, _info):
+        return str(value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+    @field_serializer('timestamp')
+    def serialize_timestamp(self, dt: datetime, _info):
+        return dt.strftime("%d/%m/%Y %H:%M:%S.%f")[:-3]
+
+
+class TransactionListResponse(BaseModel):
+    transactions: list[TransactionResponse]
+
     model_config = ConfigDict(
-        json_encoders={
-            Decimal: lambda v: str(v)
-        },
         from_attributes=True
     )
+
+    @field_serializer('transactions')
+    def serialize_transactions(self,
+                               transactions: list[TransactionResponse],
+                               _info):
+        return [transaction.model_dump() for transaction in transactions]
