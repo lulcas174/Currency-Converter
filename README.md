@@ -40,6 +40,9 @@ cp .env.example .env
 
 > ⚠️ **Importante**: Para realizar a conversão é necessário ter um `apiKey` válido.
 
+3. Caso não tenha um API key válido, faça o registro ([Nesse site](https://apilayer.com/))
+
+    3.1 Acesse ([essa api](https://apilayer.com/marketplace/exchangerates_data-api)) e realize a subscrição na api
 ## Instalação
 
 ### Pré-requisitos
