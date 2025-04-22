@@ -59,7 +59,7 @@ async def register(
         hashed_password=get_password_hash(user_data.password),
         is_active=True
     )
-    await db.add(new_user)
+    db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
     return new_user
