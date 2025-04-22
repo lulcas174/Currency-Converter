@@ -6,9 +6,9 @@ from datetime import datetime
 
 
 class TransactionCreate(BaseModel):
-    source_currency: str = Field(..., pattern="^(BRL|USD|EUR|JPY)$")
+    source_currency: str
     source_amount: Annotated[Decimal, Field(..., gt=0)]
-    target_currency: str = Field(..., pattern="^(BRL|USD|EUR|JPY)$")
+    target_currency: str
 
 
 class TransactionResponse(BaseModel):

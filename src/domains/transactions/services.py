@@ -17,7 +17,21 @@ class TransactionService:
     async def create_transaction(
             db: AsyncSession, transaction_data, user_id: UUID
     ) -> TransactionResponse:
+        if transaction_data.source_currency not in ["USD", "EUR", "BRL", "JPY"]:
+            logger.error(
+                f"Invalid source currency: {transaction_data.source_currency}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Invalid source currency, must be one of: USD, EUR, BRL, JPY"
+                ),
+            )
         if transaction_data.source_currency == transaction_data.target_currency:
+            logger.error(
+                "Source and target currencies are the same: "
+                f"{transaction_data.source_currency}"
+            )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Source and target currencies must be different",
@@ -28,6 +42,7 @@ class TransactionService:
                 transaction_data.source_currency, transaction_data.target_currency
             )
         except Exception:
+            logger.error("Exchange service error")
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                 detail="Exchange service error",
