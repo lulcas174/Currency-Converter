@@ -27,7 +27,7 @@ async def login(
                                                login_data.password,
                                                db)
     if not user:
-        raise HTTPException(status_code=400, detail="Credenciais inválidas")
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token = create_access_token(str(user.id))
     return {
         "access_token": access_token,
@@ -59,7 +59,7 @@ async def register(
         hashed_password=get_password_hash(user_data.password),
         is_active=True
     )
-    db.add(new_user)
+    await db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
     return new_user

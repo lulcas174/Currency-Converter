@@ -60,5 +60,5 @@ class TransactionService:
             logger.critical(f"Unexpected error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Erro interno no servidor",
+                detail="Server error while fetching transactions",
             )

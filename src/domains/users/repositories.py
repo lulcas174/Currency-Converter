@@ -23,11 +23,6 @@ class UserRepository:
             await db.refresh(new_user)
             return new_user
 
-    # @staticmethod
-    # async def get_user_by_email(email: str):
-    #     async with get_db() as db:
-    #         result = await db.execute(select(User).filter(User.email == email))
-    #         return result.scalar_one_or_none()
     @staticmethod
     async def get_user_by_email(email: str, db: AsyncSession):
         result = await db.execute(select(User).filter(User.email == email))

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -12,8 +12,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     is_active: bool = Field(..., description="Whether the user is active")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -22,11 +21,8 @@ class Token(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: str = Field(..., example="novo.usuario@example.com",
-                       description="User email")
-    password: str = Field(...,
-                          example="adminpassword",
-                          description="Password to acess")
+    email: str = Field(..., description="User email")
+    password: str = Field(..., description="Password to acess")
 
     model_config = {
         "json_schema_extra": {
@@ -39,9 +35,8 @@ class LoginRequest(BaseModel):
 
 
 class UserCreateRequest(BaseModel):
-    email: str = Field(..., example="novo.usuario@example.com",
-                       description="Valid email")
-    password: str = Field(..., example="SenhaF0rte!", min_length=8,
+    email: str = Field(..., description="Valid email")
+    password: str = Field(..., min_length=8,
                           description="password must be at least 8 characters")
 
     model_config = {
