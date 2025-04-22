@@ -30,10 +30,15 @@ Eu quis focar bastante na parte de separar responsabilidades, deixar cada modulo
 
 Para rodar esse projeto, você vai precisar adicionar as variáveis de ambiente no seu arquivo `.env`:
 
-1. Copie o arquivo de exemplo:
+1. Copie o arquivo de exemplo (linux):
 
 ```bash
-cp .env.example .env
+cp .env-example .env
+```
+
+1.1. Copie o arquivo de exemplo(windows)
+```bash
+copy .env-example .env
 ```
 
 2. Agora adicione os seus valores reais nas variáveis de ambiente.
@@ -45,14 +50,13 @@ cp .env.example .env
     3.1 Acesse ([essa api](https://apilayer.com/marketplace/exchangerates_data-api)) e realize a subscrição na api
 ## Instalação
 
+### Via Docker
 ### Pré-requisitos
 
 - Docker instalado ([Windows/Mac](https://www.docker.com/products/docker-desktop/))
 - Docker Compose (v2.0+)
-- Python 3.8 ou superior (para execução local)
+- Python 3.12
 - pip (gerenciador de pacotes Python)
-
-### Via Docker
 
 1. Após configurar as variáveis de ambiente, construa o container:
 
@@ -67,7 +71,11 @@ docker-compose ps
 ```
 
 ### Via Aplicação Local
+### Pré-requisitos
 
+- PostgreSQL instalado na maquina
+- Python 3.12
+- pip (gerenciador de pacotes Python)
 Para executar a aplicação localmente, também será necessário configurar as variáveis de ambiente conforme descrito anteriormente.
 
 #### Criação e ativação do ambiente virtual
